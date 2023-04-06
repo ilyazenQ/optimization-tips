@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230406065621 extends AbstractMigration
+final class Version20230406112501 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,6 +20,9 @@ final class Version20230406065621 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SEQUENCE category_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE place_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE TABLE category (id INT NOT NULL, title VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE place (id INT NOT NULL, category_id INT NOT NULL, title VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         //$this->addSql('CREATE INDEX IDX_741D53CD12469DE2 ON place (category_id)');
@@ -48,6 +51,9 @@ final class Version20230406065621 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
+        $this->addSql('DROP SEQUENCE category_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE place_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         //$this->addSql('ALTER TABLE place DROP CONSTRAINT FK_741D53CD12469DE2');
         //$this->addSql('ALTER TABLE place_user DROP CONSTRAINT FK_4726A6A5DA6A219');
         //$this->addSql('ALTER TABLE place_user DROP CONSTRAINT FK_4726A6A5A76ED395');
