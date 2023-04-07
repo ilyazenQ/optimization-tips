@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Index{% endblock %}
+
+{% block body %}
+    <h1>Index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Place Title</th>
+                <th>Users</th>
+                <th>Categories</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for place in data %}
+            <tr>
+                <td>{{ place.title }}</td>
+                <td>{{ place.users }}</td>
+                <td>{{ place.category }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
