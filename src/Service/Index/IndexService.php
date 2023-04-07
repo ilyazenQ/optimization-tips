@@ -22,7 +22,7 @@ class IndexService {
                 'title' => $place->getTitle(),
                 'category'  => $place->getCategory()->getTitle(),
                 'users' => $place->getUsers()->reduce(fn($item,User $user) => 
-                    $user->isActive()? $item .= $user->getName() . ' ': $item .= ''
+                    $user->isActive()? $item .= $user->getName() . '| ': $item .= ''
                 )
             ];
         };
