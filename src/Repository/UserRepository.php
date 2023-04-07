@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\DTOInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,18 @@ class UserRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function firstOrCreateBy(array $criteria, DTOInterface $DTO, bool $flush = false): User {
+        $entity = $this->findOneBy($criteria);
+        
+        if(is_null($entity)) {
+            $entity = new User();
+            $entity->setName($DTO->name);
+            $this->save($entity);
+        }
+
+        return $entity;
     }
 
 //    /**

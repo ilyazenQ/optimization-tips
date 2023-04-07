@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\DTOInterface;
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,6 +29,18 @@ class CategoryRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function firstOrCreateBy(array $criteria, DTOInterface $DTO, bool $flush = false): Category {
+        $entity = $this->findOneBy($criteria);
+        
+        if(is_null($entity)) {
+            $entity = new Category();
+            $entity->setTitle($DTO->title);
+            $this->save($entity);
+        }
+
+        return $entity;
     }
 
     public function remove(Category $entity, bool $flush = false): void

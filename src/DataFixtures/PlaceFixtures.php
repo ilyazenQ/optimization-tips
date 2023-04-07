@@ -23,7 +23,7 @@ class PlaceFixtures extends Fixture implements FixtureGroupInterface
         // Create places
         $count     = 1;
         $batchSize = 100;
-        for ($i = 0; $i < 10000; $i++) {
+        for ($i = 0; $i < 5000; $i++) {
             $place = new Place();
             $place->setTitle($faker->company);
 

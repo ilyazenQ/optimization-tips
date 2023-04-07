@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\DTOInterface;
 use App\Entity\Place;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,18 @@ class PlaceRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function firstOrCreateBy(array $criteria, DTOInterface $DTO, bool $flush = false): Place {
+        $entity = $this->findOneBy($criteria);
+        
+        if(is_null($entity)) {
+            $entity = new Place();
+            $entity->setTitle($DTO->title);
+            $this->save($entity);
+        }
+
+        return $entity;
     }
 
 //    /**

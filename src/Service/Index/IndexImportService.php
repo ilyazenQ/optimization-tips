@@ -2,6 +2,8 @@
 
 namespace App\Service\Index;
 
+use App\DTO\CategoryDTO;
+use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -10,7 +12,7 @@ class IndexImportService {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly IndexService $indexService,
-        private readonly SerializerInterface $serializer
+        private readonly IndexClearTableService $clearTableService
     ) {
 
     }
@@ -23,9 +25,14 @@ class IndexImportService {
     }   
 
     private function proccessFromArrayToEntity(array $array):void  {
-        
-        foreach($array as $item) {
-            dd($item);
+        $this->clearTableService->clearAllIndexTable();
+
+        foreach ($array as $item) {
+            $categoryDTO = new CategoryDTO($item['category']);
+            $category = $this->em
+            ->getRepository(Category::class)
+            ->firstOrCreateBy(['title'=>$categoryDTO->title], $categoryDTO);
+            $this->em->flush();
         }
 
     }
