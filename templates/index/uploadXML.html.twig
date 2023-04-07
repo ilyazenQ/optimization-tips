@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload xml file{% endblock %}
+
+{% block body %}
+    <h1>Upload xml file</h1>
+    <h2>{{ message }}</h2>
+
+    <a href="{{ path('app_index_index') }}">back to list</a>
+   {{ form_start(form, {'attr': {'class': 'form-horizontal', 'enctype': 'multipart/form-data'}}) }}
+    {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+    {{ form_end(form) }}
+{% endblock %}
