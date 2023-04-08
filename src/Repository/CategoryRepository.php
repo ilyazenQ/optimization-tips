@@ -37,7 +37,7 @@ class CategoryRepository extends ServiceEntityRepository
         if(is_null($entity)) {
             $entity = new Category();
             $entity->setTitle($DTO->title);
-            $this->save($entity);
+            $this->save($entity, $flush);
         }
 
         return $entity;

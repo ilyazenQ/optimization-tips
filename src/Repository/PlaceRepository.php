@@ -46,7 +46,7 @@ class PlaceRepository extends ServiceEntityRepository
         if(is_null($entity)) {
             $entity = new Place();
             $entity->setTitle($DTO->title);
-            $this->save($entity);
+            $this->save($entity, $flush);
         }
 
         return $entity;

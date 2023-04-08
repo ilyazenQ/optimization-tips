@@ -22,8 +22,8 @@ class PlaceFixtures extends Fixture implements FixtureGroupInterface
         $firstCategory = $manager->getRepository(Category::class)->findBy([],['id' =>'asc'],1)[0];
         // Create places
         $count     = 1;
-        $batchSize = 100;
-        for ($i = 0; $i < 5000; $i++) {
+        $batchSize = 250;
+        for ($i = 0; $i < 2500; $i++) {
             $place = new Place();
             $place->setTitle($faker->company);
 

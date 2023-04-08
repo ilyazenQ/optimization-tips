@@ -16,13 +16,13 @@ class UserFixtures extends Fixture
         $firstPlace = $manager->getRepository(Place::class)->findBy([],['id' =>'asc'],1)[0];
 
         // Create users
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 800; $i++) {
             $user = new User();
             $user->setName($faker->name);
             $user->setIsActive($faker->boolean(50));
 
             for ($j = 0; $j < rand(1, 4); $j++) {
-                $place = $manager->getRepository(Place::class)->find(rand($firstPlace->getId(), $firstPlace->getId()+4999));
+                $place = $manager->getRepository(Place::class)->find(rand($firstPlace->getId(), $firstPlace->getId()+2499));
                 $user->addPlace($place);
             }
 

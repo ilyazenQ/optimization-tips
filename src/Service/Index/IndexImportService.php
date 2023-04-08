@@ -3,9 +3,12 @@
 namespace App\Service\Index;
 
 use App\DTO\CategoryDTO;
+use App\DTO\PlaceDTO;
+use App\DTO\UserDTO;
 use App\Entity\Category;
+use App\Entity\Place;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class IndexImportService {
 
@@ -31,8 +34,26 @@ class IndexImportService {
             $categoryDTO = new CategoryDTO($item['category']);
             $category = $this->em
             ->getRepository(Category::class)
-            ->firstOrCreateBy(['title'=>$categoryDTO->title], $categoryDTO);
+            ->firstOrCreateBy(['title'=>$categoryDTO->title], $categoryDTO, true);
+
+            $placeDTO = new PlaceDTO($item['title']);
+            $place = $this->em
+            ->getRepository(Place::class)
+            ->firstOrCreateBy(['title'=>$placeDTO->title], $placeDTO);
+            $place->setCategory($category);
+
+            $users = explode('| ', $item['users']); 
+            foreach ($users as $userStr) { 
+                if($userStr === '') continue;
+                $userDTO = new UserDTO($userStr, true);
+                $user = $this->em
+                ->getRepository(User::class)
+                ->firstOrCreateBy(['name'=>$userDTO->name], $userDTO, true);
+
+                $place->addUser($user);
+            }
             $this->em->flush();
+
         }
 
     }

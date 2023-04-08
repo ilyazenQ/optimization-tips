@@ -46,7 +46,8 @@ class UserRepository extends ServiceEntityRepository
         if(is_null($entity)) {
             $entity = new User();
             $entity->setName($DTO->name);
-            $this->save($entity);
+            $entity->setIsActive($DTO->isActive);
+            $this->save($entity,$flush);
         }
 
         return $entity;
