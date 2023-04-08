@@ -4,6 +4,8 @@ FROM php:8.1.0-fpm-alpine
 RUN apk add --no-cache curl git build-base zlib-dev oniguruma-dev autoconf bash
 
 RUN echo "memory_limit=512M" >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
+RUN echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini;
+
 
 # Xdebug
 ARG INSTALL_XDEBUG=false
