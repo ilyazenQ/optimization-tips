@@ -6,6 +6,7 @@ use App\Entity\Place;
 use App\Entity\User;
 use Closure;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class IndexService {
 
@@ -30,16 +31,29 @@ class IndexService {
         return $transformer;
     }
     
-    public function getIndexList(): array { 
-        return $this->em
+    public function getIndexList(Request $request): array { 
+        $q = $this->em
             ->getRepository(Place::class)
             ->createQueryBuilder('p')
             ->select('u','c','p')
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.category', 'c')
-            ->orderBy('p.title', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('p.title', 'ASC');
+        
+        // Пагинация смещением
+        if((null !== (int)$request->get('limit')) && (null !== (int)$request->get('offset'))) {
+            $q->setFirstResult((int)$request->get('offset'));
+            $q->setMaxResults((int)$request->get('limit'));
+        };
+
+        //Курсорная пагинация
+        if((null !== (int)$request->get('limit')) && (null !== $request->get('cursor_title'))) {
+            $q->where('p.title > :cursor');
+            $q->setParameter('cursor', $request->get('cursor_title'));
+            $q->setMaxResults((int)$request->get('limit'));
+        };
+
+        return $q->getQuery()->getResult();
     }
 
 }

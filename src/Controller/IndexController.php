@@ -15,10 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index_index', methods: ['GET'])]
-    public function index(IndexService $service): Response
+    public function index(IndexService $service, Request $request): Response
     {        
         return $this->render('index/index.html.twig', [
-            'data' => array_map($service->getTransformerForIndex(), $service->getIndexList()),
+            'data' => array_map($service->getTransformerForIndex(), $service->getIndexList($request)),
         ]);
     }
 
