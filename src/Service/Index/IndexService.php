@@ -41,13 +41,13 @@ class IndexService {
             ->orderBy('p.title', 'ASC');
         
         // Пагинация смещением
-        if((null !== (int)$request->get('limit')) && (null !== (int)$request->get('offset'))) {
+        if((null !== $request->get('limit')) && (null !== $request->get('offset'))) {
             $q->setFirstResult((int)$request->get('offset'));
             $q->setMaxResults((int)$request->get('limit'));
         };
 
         //Курсорная пагинация
-        if((null !== (int)$request->get('limit')) && (null !== $request->get('cursor_title'))) {
+        if((null !== $request->get('limit')) && (null !== $request->get('cursor_title'))) {
             $q->where('p.title > :cursor');
             $q->setParameter('cursor', $request->get('cursor_title'));
             $q->setMaxResults((int)$request->get('limit'));
