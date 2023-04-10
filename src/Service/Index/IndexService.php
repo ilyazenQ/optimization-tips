@@ -22,7 +22,7 @@ class IndexService {
                 'title' => $place->getTitle(),
                 'category'  => $place->getCategory()->getTitle(),
                 'users' => $place->getUsers()->reduce(fn($item,User $user) => 
-                    $user->isActive()? $item .= $user->getName() . '| ': $item .= ''
+                    $item .= $user->getName() . '| '
                 )
             ];
         };
@@ -36,7 +36,7 @@ class IndexService {
             ->createQueryBuilder('p')
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.category', 'c')
-            ->where('u.isActive = true')
+            ->orderBy('p.title', 'ASC')
             ->getQuery()
             ->getResult();
     }
