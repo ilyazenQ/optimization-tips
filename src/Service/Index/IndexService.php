@@ -34,6 +34,7 @@ class IndexService {
         return $this->em
             ->getRepository(Place::class)
             ->createQueryBuilder('p')
+            ->select('u','c','p')
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.category', 'c')
             ->orderBy('p.title', 'ASC')
