@@ -10,10 +10,10 @@
 ## Разворот
 
 1. `git clone {project}`<br>
-2. `make dc_build`<br>
-3. `make dc_up`<br>
-4. `make app_bash`<br>
-5. `cp .env copy .env` <br>
+2. Скопировать `.env copy` -> `.env` в корне проекта и `.env.dist` -> `.env` в папке docker  <br>
+3. `make dc_build`<br>
+4. `make dc_up`<br>
+5. `make app_bash`<br>
 6. `composer install`<br>
 7. `bin/console doctrine:migrations:migrate`<br>
 
