@@ -40,6 +40,15 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+    public function createFromDTO(DTOInterface $DTO, bool $flush = false): User {
+        $entity = new User();
+        $entity->setName($DTO->name);
+        $entity->setIsActive($DTO->isActive);
+        $this->save($entity, $flush);
+
+        return $entity;
+    }
+
     public function firstOrCreateBy(array $criteria, DTOInterface $DTO, bool $flush = false): User {
         $entity = $this->findOneBy($criteria);
         
