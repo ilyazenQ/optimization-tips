@@ -9,6 +9,7 @@ use App\Entity\Category;
 use App\Entity\Place;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use SimpleXMLElement;
 
 class IndexImportService {
 

@@ -40,6 +40,14 @@ class PlaceRepository extends ServiceEntityRepository
         }
     }
 
+    public function createFromDTO(DTOInterface $DTO, bool $flush = false): Place {
+        $entity = new Place();
+        $entity->setTitle($DTO->title);
+        $this->save($entity, $flush);
+
+        return $entity;
+    }
+
     public function firstOrCreateBy(array $criteria, DTOInterface $DTO, bool $flush = false): Place {
         $entity = $this->findOneBy($criteria);
         

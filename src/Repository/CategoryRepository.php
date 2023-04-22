@@ -43,6 +43,15 @@ class CategoryRepository extends ServiceEntityRepository
         return $entity;
     }
 
+
+    public function createFromDTO(DTOInterface $DTO, bool $flush = false): Category {
+        $entity = new Category();
+        $entity->setTitle($DTO->title);
+        $this->save($entity, $flush);
+
+        return $entity;
+    }
+
     public function remove(Category $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
