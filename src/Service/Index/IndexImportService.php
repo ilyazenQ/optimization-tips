@@ -9,6 +9,7 @@ use App\Entity\Category;
 use App\Entity\Place;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 
 class IndexImportService {
@@ -16,7 +17,8 @@ class IndexImportService {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly IndexService $indexService,
-        private readonly IndexClearTableService $clearTableService
+        private readonly IndexClearTableService $clearTableService,
+        private readonly LoggerInterface $logger,
     ) {
 
     }
@@ -27,9 +29,24 @@ class IndexImportService {
         $xmlData = simplexml_load_file($file);
         $categoriesFromFile = array_unique($xmlData->xpath('//category'));
         $usersFromFile = array_unique($xmlData->xpath('//users'));
+        $this->logger->info('Потребление памяти до начала обработки '.memory_get_usage());
+        $this->logger->info('Unit of work до начала обработки '. $this->em->getUnitOfWork()->size());
+        
+        $this->logger->info('Потребление памяти до обработки категорий '.memory_get_usage());
+        $this->logger->info('Unit of work до обработки категорий '. $this->em->getUnitOfWork()->size());
         $this->processCategory($categoriesFromFile);
+        $this->logger->info('Потребление памяти после обработки категорий и до обработки пользователей '.memory_get_usage());
+        $this->logger->info('Unit of work после обработки категорий и до обработки пользователей '. $this->em->getUnitOfWork()->size());
         $this->processUser($this->getUsersFromFile($usersFromFile));
+        $this->logger->info('Потребление памяти после обработки пользователей и до обработки мест '.memory_get_usage());
+        $this->logger->info('Unit of work после обработки пользователей и до обработки мест '. $this->em->getUnitOfWork()->size());
         $this->processPlace($this->fromXmlToArr($xmlData));
+        $this->logger->info('Потребление памяти после обработки мест '.memory_get_usage());
+        $this->logger->info('Unit of work после обработки мест '. $this->em->getUnitOfWork()->size());
+
+        $this->logger->info('Потребление памяти после окончания обработки '.memory_get_usage());
+        $this->logger->info('Unit of work после окончания обработки '. $this->em->getUnitOfWork()->size());
+
     }
 
     private function processCategory(array $categories):void {
@@ -45,7 +62,7 @@ class IndexImportService {
     }
 
     private function processUser(array $users):void {
-        
+
         foreach($users as $user) {
             $userDTO = new UserDTO($user,true);
             $this->em
@@ -53,10 +70,11 @@ class IndexImportService {
             ->createFromDTO($userDTO);
             $this->em->flush(); 
         }
+
     }
 
     private function processPlace(array $array):void {
-
+        
         foreach ($array as $item) {
             $categoryDTO = new CategoryDTO($item['category']);
             $category = $this->em
@@ -81,6 +99,7 @@ class IndexImportService {
             $this->em->persist($place);
             $this->em->flush();
         }
+
     }
 
     private function fromXmlToArr(SimpleXMLElement $xmlData):array {
