@@ -29,24 +29,11 @@ class IndexImportService {
         $xmlData = simplexml_load_file($file);
         $categoriesFromFile = array_unique($xmlData->xpath('//category'));
         $usersFromFile = array_unique($xmlData->xpath('//users'));
-        $this->logger->info('Потребление памяти до начала обработки '.memory_get_usage());
-        $this->logger->info('Unit of work до начала обработки '. $this->em->getUnitOfWork()->size());
-        
-        $this->logger->info('Потребление памяти до обработки категорий '.memory_get_usage());
-        $this->logger->info('Unit of work до обработки категорий '. $this->em->getUnitOfWork()->size());
+        $placesFromFile = $this->fromXmlToArr($xmlData);
+
         $this->processCategory($categoriesFromFile);
-        $this->logger->info('Потребление памяти после обработки категорий и до обработки пользователей '.memory_get_usage());
-        $this->logger->info('Unit of work после обработки категорий и до обработки пользователей '. $this->em->getUnitOfWork()->size());
         $this->processUser($this->getUsersFromFile($usersFromFile));
-        $this->logger->info('Потребление памяти после обработки пользователей и до обработки мест '.memory_get_usage());
-        $this->logger->info('Unit of work после обработки пользователей и до обработки мест '. $this->em->getUnitOfWork()->size());
-        $this->processPlace($this->fromXmlToArr($xmlData));
-        $this->logger->info('Потребление памяти после обработки мест '.memory_get_usage());
-        $this->logger->info('Unit of work после обработки мест '. $this->em->getUnitOfWork()->size());
-
-        $this->logger->info('Потребление памяти после окончания обработки '.memory_get_usage());
-        $this->logger->info('Unit of work после окончания обработки '. $this->em->getUnitOfWork()->size());
-
+        $this->processPlace($placesFromFile);
     }
 
     private function processCategory(array $categories):void {
