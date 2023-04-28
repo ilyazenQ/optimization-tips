@@ -32,26 +32,23 @@ class IndexController extends AbstractController
         $form = $this->createFormBuilder()
         ->add('file', FileType::class)
         ->add('submit', SubmitType::class, ['label' => 'Upload'])
-        ->getForm();
+        ->getForm();    
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('file')->getData();
+            // Обработка файла
+            $indexImportService->importFromXml($file);
+
+            return $this->render('index/uploadXML.html.twig', [
+                'form' => $form->createView(),
+                'message' => 'Upload completed'
+            ]); 
+        }
     
-    $form->handleRequest($request);
-    
-    if ($form->isSubmitted() && $form->isValid()) {
-        $file = $form->get('file')->getData();
-        
-        $indexImportService->importFromXml($file);
-        // Обработка файла
-        
         return $this->render('index/uploadXML.html.twig', [
             'form' => $form->createView(),
-            'message' => 'Upload completed'
-        ]); 
-    }
-    
-    return $this->render('index/uploadXML.html.twig', [
-        'form' => $form->createView(),
-        'message' => ''
-    ]);    
+            'message' => ''
+        ]);    
     
     }
 

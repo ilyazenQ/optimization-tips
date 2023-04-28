@@ -24,13 +24,15 @@ class IndexImportService {
     }
 
     public function importFromXml(mixed $file):void {
+        // Truncate таблиц Category, User, Place и их связей
         $this->clearTableService->clearAllIndexTable();
-
+        // Получение содержимого файла
         $xmlData = simplexml_load_file($file);
+        // Преобразование в содержимого в массивы
         $categoriesFromFile = array_unique($xmlData->xpath('//category'));
         $usersFromFile = array_unique($xmlData->xpath('//users'));
         $placesFromFile = $this->fromXmlToArr($xmlData);
-
+        // Обрабатываем информацию, заполняем базу данных
         $this->processCategory($categoriesFromFile);
         $this->processUser($this->getUsersFromFile($usersFromFile));
         $this->processPlace($placesFromFile);
@@ -39,10 +41,13 @@ class IndexImportService {
     private function processCategory(array $categories):void {
 
         foreach($categories as $cat) {
+            // Заполняем DTO
             $categoryDTO = new CategoryDTO($cat->__toString());
-            $this->em
-            ->getRepository(Category::class)
-            ->createFromDTO($categoryDTO);
+            // Создаем новый объект из DTO, делаем persist
+            $category = new Category();
+            $category->setTitle($categoryDTO->title);
+            $this->em->persist($category);
+            // Синхронизируем изменения с бд
             $this->em->flush(); 
         }
 
@@ -51,29 +56,32 @@ class IndexImportService {
     private function processUser(array $users):void {
 
         foreach($users as $user) {
+            // Заполняем DTO
             $userDTO = new UserDTO($user,true);
-            $this->em
-            ->getRepository(User::class)
-            ->createFromDTO($userDTO);
+            // Создаем новый объект из DTO, делаем persist
+            $newUser = new User();
+            $newUser->setName($userDTO->name);
+            $newUser->setIsActive($userDTO->isActive);
+            $this->em->persist($newUser);
+            // Синхронизируем изменения с бд
             $this->em->flush(); 
         }
 
     }
 
     private function processPlace(array $array):void {
-        
         foreach ($array as $item) {
+            // Поиск связанной категории по title
             $categoryDTO = new CategoryDTO($item['category']);
             $category = $this->em
             ->getRepository(Category::class)
             ->findOneBy(['title'=>$categoryDTO->title]);
-
+            // Создаем новый объект из DTO
             $placeDTO = new PlaceDTO($item['title']);
-            $place = $this->em
-            ->getRepository(Place::class)
-            ->createFromDTO($placeDTO);
+            $place = new Place();
+            $place->setTitle($placeDTO->title);
             $place->setCategory($category);
-
+            // Поиск пользователей
             $users = $this->getUsersFromItem($item['users']);
             foreach ($users as $user) { 
                 $user = $this->em
@@ -82,11 +90,10 @@ class IndexImportService {
 
                 $place->addUser($user);
             }
-
             $this->em->persist($place);
+            // Синхронизируем изменения с бд
             $this->em->flush();
         }
-
     }
 
     private function fromXmlToArr(SimpleXMLElement $xmlData):array {
