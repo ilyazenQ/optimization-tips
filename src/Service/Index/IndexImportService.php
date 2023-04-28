@@ -32,14 +32,25 @@ class IndexImportService {
         $categoriesFromFile = array_unique($xmlData->xpath('//category'));
         $usersFromFile = array_unique($xmlData->xpath('//users'));
         $placesFromFile = $this->fromXmlToArr($xmlData);
+
         // Обрабатываем информацию, заполняем базу данных
+        dump('Потребление памяти до обработки', memory_get_usage());
         $this->processCategory($categoriesFromFile);
+        dump('Потребление памяти после обработки категорий', memory_get_usage());
+        dump('UnitOfWork после обработки категорий', $this->em->getUnitOfWork()->size());
         $this->processUser($this->getUsersFromFile($usersFromFile));
+        dump('Потребление памяти после обработки пользователей', memory_get_usage());
+        dump('UnitOfWork после обработки пользователей', $this->em->getUnitOfWork()->size());
         $this->processPlace($placesFromFile);
+        dump('UnitOfWork в конце работы скрипта', $this->em->getUnitOfWork()->size());
+        dump('Потребление памяти в конце работы скрипта', memory_get_usage());
+
     }
 
     private function processCategory(array $categories):void {
-
+        // Количество записей, которые будут вставлены за один запрос
+        $count     = 1;
+        $batchSize = 250;
         foreach($categories as $cat) {
             // Заполняем DTO
             $categoryDTO = new CategoryDTO($cat->__toString());
@@ -47,14 +58,24 @@ class IndexImportService {
             $category = new Category();
             $category->setTitle($categoryDTO->title);
             $this->em->persist($category);
-            // Синхронизируем изменения с бд
-            $this->em->flush(); 
-        }
 
+            if ($count % $batchSize === 0) {
+                $this->em->flush();
+                // очистить EntityManager для уменьшения использования памяти
+                $this->em->clear();
+                $count = 1;
+            } else {
+                $count++;
+            }
+        }
+           $this->em->flush();
+           $this->em->clear();
     }
 
     private function processUser(array $users):void {
-
+        // Количество записей, которые будут вставлены за один запрос
+        $count     = 1;
+        $batchSize = 250;
         foreach($users as $user) {
             // Заполняем DTO
             $userDTO = new UserDTO($user,true);
@@ -63,13 +84,23 @@ class IndexImportService {
             $newUser->setName($userDTO->name);
             $newUser->setIsActive($userDTO->isActive);
             $this->em->persist($newUser);
-            // Синхронизируем изменения с бд
-            $this->em->flush(); 
+            if ($count % $batchSize === 0) {
+                $this->em->flush();
+                // очистить EntityManager для уменьшения использования памяти
+                $this->em->clear();
+                $count = 1;
+            } else {
+                $count++;
+            }
         }
-
+           $this->em->flush();
+           $this->em->clear();
     }
 
     private function processPlace(array $array):void {
+        // Количество записей, которые будут вставлены за один запрос
+        $count     = 1;
+        $batchSize = 250;
         foreach ($array as $item) {
             // Поиск связанной категории по title
             $categoryDTO = new CategoryDTO($item['category']);
@@ -91,9 +122,17 @@ class IndexImportService {
                 $place->addUser($user);
             }
             $this->em->persist($place);
-            // Синхронизируем изменения с бд
-            $this->em->flush();
+            if ($count % $batchSize === 0) {
+                $this->em->flush();
+                // очистить EntityManager для уменьшения использования памяти
+                $this->em->clear();
+                $count = 1;
+            } else {
+                $count++;
+            }
         }
+           $this->em->flush();
+           $this->em->clear();
     }
 
     private function fromXmlToArr(SimpleXMLElement $xmlData):array {
