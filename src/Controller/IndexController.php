@@ -55,7 +55,7 @@ class IndexController extends AbstractController
     #[Route('/test', name: 'app_index_test', methods: ['GET'])]
     public function test(IndexService $service, IndexClearTableService $clearTableService, LoggerInterface $logger, EntityManagerInterface $em): Response
     {        
-        $clearTableService->clearAllIndexTable();
+       // $clearTableService->clearAllIndexTable();
         
 //Создаем новый обьект
 //$category = new Category();
@@ -82,22 +82,51 @@ class IndexController extends AbstractController
 //$em->flush();
 
 // Создаем сущности
-dump('Потребление памяти в начале скрипта', memory_get_usage());
-for ($i=0; $i < 10000; $i++) { 
-    $newCategory = new Category();
-    $newCategory->setTitle($i . 'title');
-    $em->persist($newCategory);
-}
+//dump('Потребление памяти в начале скрипта', memory_get_usage());
+//for ($i=0; $i < 10000; $i++) { 
+//    $newCategory = new Category();
+//    $newCategory->setTitle($i . 'title');
+//    $em->persist($newCategory);
+//}
+//$em->flush();
+//$em->clear();
+//dump('UnitOfWork после создания категорий', $em->getUnitOfWork()->size());
+// ... Иная логика
+$category = new Category();
+$category->setTitle('1234');
+$em->persist($category);
 $em->flush();
 $em->clear();
-dump('UnitOfWork после создания категорий', $em->getUnitOfWork()->size());
-// ... Иная логика
-$someCat = new Category();
-$someCat->setTitle('Тестовая категория 2');
-$em->persist($someCat);
+
+$someCat = $em
+            ->getRepository(Category::class)
+            ->findOneBy(['title'=>'1234']);
+dump('IdentityMap до remove', $em->getUnitOfWork()->getIdentityMap());
+$em->remove($someCat);
+dump('IdentityMap после remove', $em->getUnitOfWork()->getIdentityMap());
+dump('ScheduledEntityDeletions после remove', $em->getUnitOfWork()->getScheduledEntityDeletions());
+$someCat->setTitle('123');
+dump('IdentityMap после попытки обновить', $em->getUnitOfWork()->getIdentityMap());
+dump('ScheduledEntityUpdates после попытки обновить', $em->getUnitOfWork()->getScheduledEntityUpdates());
 $em->flush();
-dump('UnitOfWork в конце работы скрипта', $em->getUnitOfWork()->size());
-dump('Потребление памяти в конце скрипта', memory_get_usage());
+//$em->flush();
+//dump('IdentityMap до update', $em->getUnitOfWork()->getIdentityMap());
+//$category->setTitle('1234');
+//dump('IdentityMap после update', $em->getUnitOfWork()->getIdentityMap());
+//dump('ScheduledEntityUpdates после update', $em->getUnitOfWork()->getScheduledEntityUpdates());
+
+
+//dump('IdentityMap до remove', $em->getUnitOfWork()->getIdentityMap());
+//$em->remove($someCat);
+//dump('IdentityMap после remove', $em->getUnitOfWork()->getIdentityMap());
+//dump('ScheduledEntityDeletions после remove', $em->getUnitOfWork()->getScheduledEntityDeletions());
+//$someCat->setTitle('123');
+//$em->flush();
+//dump('IdentityMap после update', $em->getUnitOfWork()->getIdentityMap());
+
+
+//dump('UnitOfWork в конце работы скрипта', $em->getUnitOfWork()->size());
+//dump('Потребление памяти в конце скрипта', memory_get_usage());
 
 
 
